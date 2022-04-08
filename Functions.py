@@ -40,6 +40,7 @@ Sigmoid = Function(lambda x: 1.0/(1.0+np.exp(-x)), lambda x:(1.0/(1.0+np.exp(-x)
 Tanh = Function(lambda x:(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)),
                 lambda x:1-((np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)))**2)
 
+Id = Function(lambda x: x, lambda x: 1)
 
 class LossFunction(Function):
     def __init__(self, fn: Callable, dfn: Callable):

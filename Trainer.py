@@ -1,6 +1,6 @@
 from LoadData import *
 from NeuralNetwork import *
-
+from os import system
 
 class Trainer:
 
@@ -18,7 +18,7 @@ class Trainer:
     def train(self, epochs: int = 1000):
         for i in range(epochs):
             X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=self.NN.batch_size,
-                                 classes=CLASSES, equilibrium=False)
+                                 classes=CLASSES, equilibrium=True)
             P = self.NN.forward(X)
             c = self.NN.compute_cost(P, Y)
             print(c, " | ",percent_good(P,Y))
@@ -44,16 +44,15 @@ def percent_good(predictions: np.array, observations: np.array):
 
 if __name__ == "__main__":
     batch_size = 48
-    learning_rate = 0.5
+    learning_rate = 0.01
     learning_rate_stop = 0.01
-    nn = NeuralNetwork([DenseLayer(ReLu, 784, 89, batch_size=batch_size),
-                        DenseLayer(ReLu, 89, 89, batch_size=batch_size),
-                        DenseLayer(Sigmoid, 89, 16, batch_size=batch_size)],
-                        #OutputLayer(Softmax, 89, 16,
-                        #            batch_size=batch_size)],
-                       CLASSES, cross_entropy_cost, batch_size=batch_size)
+    nn = NeuralNetwork([DenseLayer(89, 784, Tanh, batch_size=batch_size),
+                        #DenseLayer(89, 89, ReLu, batch_size=batch_size),
+                        DenseLayer(16,89, Id, batch_size=batch_size)],
+                       CLASSES, cross_entropy_cost,Softmax, batch_size=batch_size)
     SGD = Trainer(nn, learning_rate, learning_rate_stop)
-    SGD.train(epochs=1000)
+    SGD.train(epochs=2000)
+    SGD.train(epochs=1)
     #P = np.array([[0.1,0.3,0.2],
     #              [0.8,0.6,0.3],
     #              [0.1,0.1,0.5]])

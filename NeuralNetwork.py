@@ -6,11 +6,13 @@ from Layers import *
 class NeuralNetwork:
 
     def __init__(self, layers: [DenseLayer],
-                         classes: list, C: Callable ,batch_size: int=32):
+                        classes: list, C: Callable, L: LossFunction,
+                        batch_size: int=32):
         self.layers = layers
         self.batch_size = batch_size
         self.classes = classes
         self.C = C
+        self.L = L
 
     def forward(self, X: np.array):
         assert(X.shape[1] == self.batch_size)
@@ -20,7 +22,7 @@ class NeuralNetwork:
         return res
 
     def backward(self, Y: np.array, lr: float=0.01):
-        grad = Y
+        grad = self.L.derive(self.layers[-1].A_of_z, Y)
         for layer in reversed(self.layers):
             grad = layer.backward(grad, lr=lr)
         return None

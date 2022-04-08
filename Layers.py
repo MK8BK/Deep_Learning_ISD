@@ -29,8 +29,7 @@ class DenseLayer:
             Backward propagation of layer, given d, genrates random weights, zeros B
 
     """
-    def __init__(self, A: Function, F: int, N: int,
-                         batch_size: int=32):
+    def __init__(self, N: int, F: int, A: Function=Id, batch_size: int=32):
         #fonction d'activation
         self.A = A
         #Neurones dans cette couche
