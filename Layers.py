@@ -66,7 +66,7 @@ class DenseLayer:
 
         #avoid vectors of shape (n,)
         dA_of_Z = np.atleast_2d(dA_of_Z)
-        assert(dA_of_Z.shape == self.A_of_z.shape),\
+        assert(dA_of_Z.shape == self.Z.shape),\
             f"""Incompatible shapes: dA_of_Z: {dA_of_Z.shape} 
                                      A_of_z:  {self.A_of_z.shape}"""
 
@@ -74,7 +74,7 @@ class DenseLayer:
         #standard dense layer
         #elementwise (Hadamard) product
         dZ = np.multiply(dA_of_Z, self.A.derive(self.Z))
-
+        assert(dZ.shape == dA_of_Z.shape)
         #derivative of error with respect to weights
         dW = (1./self.S)*np.dot(dZ, self.X.T)
         #derivative of error with respect to biases
@@ -95,40 +95,6 @@ class DenseLayer:
         return dX
 
 #tried inheritance
-class OutputLayer(DenseLayer):
-    def __init__(self, A: LossFunction, F: int, N: int,
-        batch_size: int=32):
-
-        super().__init__(A, F, N, batch_size=batch_size)
-
-    def backward(self, dA_of_Z: np.array, lr: float=1.0)->np.array:
-        #avoid vectors of shape (n,)
-        dA_of_Z = np.atleast_2d(dA_of_Z)
-        assert(dA_of_Z.shape == self.A_of_z.shape),\
-            f"""Incompatible shapes: dA_of_Z: {dA_of_Z.shape} 
-                                     A_of_z:  {self.A_of_z.shape}"""
-
-        #output layer
-        #Derivative (specific to loss function)
-        dZ = self.A.derive(self.Z, dA_of_Z)
-        #print(dZ.shape)
-        #print(self.A_of_z.T.shape)
-        #derivative of error with respect to weights
-        dW = (1./self.S)*np.dot(dZ, self.X.T)
-        #print(dW.shape, "<- here")
-        #print(self.W.shape)
-        #derivative of error with respect to biases
-        dB = (1./self.S)*np.sum(dZ, axis=1, keepdims=True)
-        #derivative of error with respect to layer input
-        #                     (ouptput of previous layer)
-        dX = np.dot(self.W.T, dZ)
-
-        #Update weights
-        self.W = self.W - lr*dW
-        #Update biases
-        self.B = self.B - lr*dB
-        #send backward the derivative of the error with respect to input layer
-        return dX
 
 
 ### dimension errors for now, working on it,

@@ -21,44 +21,64 @@ class Trainer:
                                  classes=CLASSES, equilibrium=False)
             P = self.NN.forward(X)
             c = self.NN.compute_cost(P, Y)
-            nn.backward(Y, lr=self.lr)
-            print(c)
+            print(c, " | ",percent_good(P,Y))
+            #print(P,Y)
+            self.NN.backward(Y, lr=self.lr)
         print("\n")
 
+
+def percent_good(predictions: np.array, observations: np.array):
+    assert(predictions.shape==observations.shape),\
+        f"""you dun goofed up {predictions.shape}!={observations.shape}"""
+    observations = np.argmax(observations, axis=1)
+    predictions = np.argmax(predictions, axis=1)
+    missed = 0
+    for o,p in zip(observations, predictions):
+        if o!=p:
+            missed+=1
+    accuracy = 100*(predictions.shape[0]-missed)/predictions.shape[0]
+    return accuracy
 
 # learning rate, dropout, momentum
 
 
 if __name__ == "__main__":
+    batch_size = 48
+    learning_rate = 0.5
+    learning_rate_stop = 0.01
+    nn = NeuralNetwork([DenseLayer(ReLu, 784, 89, batch_size=batch_size),
+                        DenseLayer(ReLu, 89, 89, batch_size=batch_size),
+                        DenseLayer(Sigmoid, 89, 16, batch_size=batch_size)],
+                        #OutputLayer(Softmax, 89, 16,
+                        #            batch_size=batch_size)],
+                       CLASSES, cross_entropy_cost, batch_size=batch_size)
+    SGD = Trainer(nn, learning_rate, learning_rate_stop)
+    SGD.train(epochs=1000)
+    #P = np.array([[0.1,0.3,0.2],
+    #              [0.8,0.6,0.3],
+    #              [0.1,0.1,0.5]])
+    #Y = np.array([[1,0,0],
+    #              [0,1,0],
+    #              [0,0,1]])
+    #print(percent_good(P,Y))
+
+
+    #print(f"Empty main in : '{__file__[-10:]}'")
+
     #batch_size = 32
-    #learning_rate = 0.01
-    #learning_rate_stop = 0.01
+    #learning_rate = 5
     #nn = NeuralNetwork([DenseLayer(ReLu, 784, 89, batch_size=batch_size),
     #                    DenseLayer(ReLu, 89, 89, batch_size=batch_size),
-    #                    DenseLayer(ReLu, 89, 16, batch_size=batch_size)],
-    #                    #OutputLayer(Softmax, 89, 16,
-    #                    #            batch_size=batch_size)],
-    #                   CLASSES, cross_entropy_cost, batch_size=32)
-    #SGD = Trainer(nn, learning_rate, learning_rate_stop)
-    #SGD.train()
-    
-    print(f"Empty main in : '{__file__[-10:]}'")
-
-    batch_size = 32
-    learning_rate = 5
-    nn = NeuralNetwork([DenseLayer(ReLu, 784, 89, batch_size=batch_size),
-            DenseLayer(ReLu, 89, 89, batch_size=batch_size),
-            OutputLayer(Softmax,89,16,
-                batch_size=batch_size)],
-            CLASSES,cross_entropy_cost, batch_size=32)
-    X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
-                            classes=CLASSES, equilibrium=False)
-    P = nn.forward(X)
-    #print(Y.shape, "\n", P.shape)
-    c = nn.compute_cost(P, Y)
-    print(c)
-    nn.backward(Y, lr=learning_rate)
-    P = nn.forward(X)
-    c = nn.compute_cost(P, Y)
-    print(c)
-    print(X.shape,"\n\n\n\n\n",Y.shape)
+    #                    DenseLayer(ReLu,89,16, batch_size=batch_size)],
+    #                    CLASSES,cross_entropy_cost, batch_size=32)
+    #X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
+    #                        classes=CLASSES, equilibrium=False)
+    #P = nn.forward(X)
+    ##print(Y.shape, "\n", P.shape)
+    #c = nn.compute_cost(P, Y)
+    #print(c)
+    #nn.backward(Y, lr=learning_rate)
+    #P = nn.forward(X)
+    #c = nn.compute_cost(P, Y)
+    #print(c)
+    #print(X.shape,"\n\n\n\n\n",Y.shape)
