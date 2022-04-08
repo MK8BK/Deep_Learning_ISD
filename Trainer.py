@@ -20,8 +20,9 @@ class Trainer:
             X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=self.NN.batch_size,
                                  classes=CLASSES, equilibrium=True)
             P = self.NN.forward(X)
-            c = self.NN.compute_cost(P, Y)
-            print(c, " | ",mae(P,Y))
+            if i%20==0:
+                c = self.NN.compute_cost(P, Y)
+                print(c, " | ",rmse(P,Y))
             #print(P,Y)
             self.NN.backward(Y, lr=self.lr)
         print("\n")
@@ -33,12 +34,12 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    batch_size = 96
-    learning_rate = 0.02
+    batch_size = 32
+    learning_rate = 0.01
     learning_rate_stop = 0.1
     nn = NeuralNetwork([DenseLayer(89, 784, Tanh, batch_size=batch_size),
                         #DenseLayer(89, 89, ReLu, batch_size=batch_size),
-                        DenseLayer(16,89, Id, batch_size=batch_size)],
+                        DenseLayer(16,89, Id, batch_size=batch_size, p=True)],
                        CLASSES, cross_entropy_cost, Softmax, batch_size=batch_size)
     SGD = Trainer(nn, learning_rate, learning_rate_stop)
     SGD.train(epochs=500)

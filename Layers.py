@@ -29,7 +29,7 @@ class DenseLayer:
             Backward propagation of layer, given d, genrates random weights, zeros B
 
     """
-    def __init__(self, N: int, F: int, A: Function=Id, batch_size: int=32):
+    def __init__(self, N: int, F: int, A: Function=Id, batch_size: int=32,p=False):
         #fonction d'activation
         self.A = A
         #Neurones dans cette couche
@@ -42,6 +42,7 @@ class DenseLayer:
         self.W = np.random.randn(self.N, self.F) * np.sqrt(2/self.F)
         #B: biais associee a chaque neurone (ligne) (vecteur colonne)
         self.B = np.zeros((self.N,1))
+        self.p = p
 
     def forward(self, X: np.array) -> np.array:
 
@@ -85,7 +86,8 @@ class DenseLayer:
         self.W = self.W - lr*dW
         #Update biases
         self.B = self.B - lr*dB
-
+        #if(self.p):
+        #    print(self.W)
         #implementing momentum
 
         #implementing 

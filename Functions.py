@@ -56,11 +56,10 @@ class LossFunction(Function):
 #softmax per column
 def s(x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)
+def ds(predictions, labels):
+    return (1./len(predictions))*(-(labels/predictions) + ((1 - labels)/(1 - predictions)))
 
-#dAL = - (np.divide(Y, AL) - np.divide(1 - Y, 1 - AL))
-
-Softmax = LossFunction(s,
-    lambda predictions, labels: (s(predictions)-labels)/len(predictions))
+Softmax = LossFunction(s,ds)
 
 #cross entropy cost for mini-batch
 def cross_entropy_cost(predictions: np.array, labels: np.array) -> float:
@@ -84,7 +83,7 @@ def mae(preds: np.array, actuals: np.array):
     '''
     return np.mean(np.abs(preds - actuals))
 
-def rmse(preds: ndarray, actuals: ndarray):
+def rmse(preds: np.array, actuals: np.array):
     '''
     Compute root mean squared error.
     '''
