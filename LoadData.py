@@ -5,7 +5,6 @@ import numpy as np
 from PIL import Image, ImageOps
 
 
-
 #global classes list
 CLASSES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
             "A", "B", "C", "D", "E", "F"]
@@ -85,7 +84,7 @@ def make_labels(filenames: list[str]) -> np.array:
         @param: filenames: a list of strings, relative str_paths to files
         @return: labels: a list of int labels : the class of each file
     """
-    labels = [char_to_label(filename[16:17]) for filename in filenames]
+    labels = [char_to_label(filename[18:19]) for filename in filenames]
     return labels
 
 
@@ -128,9 +127,9 @@ def make_random_batch(path: str, batch_size: int, classes: list[str],
             f"can't divide batch size {batch_size} equally among {len(classes)} classes"
         
         perClass = batch_size//len(classes)
-        print(perClass)
         batch = [listChoice(directory) for directory in imgs_per_directory 
                     for i in range(perClass)]
+        batch = [path+img[0]+'/'+img for img in batch]
         listShuffle(batch)
         return batch
     
@@ -178,9 +177,9 @@ def split_data(X: np.array, Y: np.array,
 
 if __name__ == "__main__":
     #help(make_labels)
-    X, Y = load_data_set("../EMNIST_DATA_SET/", batch_size=20,
+    X, Y = load_data_set("EMNIST_DATA_SET/", batch_size=20,
                             classes=CLASSES, equilibrium=False)
-    print(X.shape, "\n\n", Y.shape, "\n")
+    print(X, "\n\n", Y, "\n")
     X_test, Y_test, X_train, Y_train = split_data(X, Y, percent_test=25)
     print(X_test.shape, "\n", Y_test.shape, "\n", X_train.shape, "\n", Y_train.shape)
     print("No errors")
