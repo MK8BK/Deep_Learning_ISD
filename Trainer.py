@@ -15,43 +15,33 @@ class Trainer:
         self.momentum = momentum
         self.dropout = dropout
 
-    def train(self, epochs: int = 1000):
+    def train(self, epochs: int = 50):
         for i in range(epochs):
             X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=self.NN.batch_size,
                                  classes=CLASSES, equilibrium=True)
             P = self.NN.forward(X)
             c = self.NN.compute_cost(P, Y)
-            print(c, " | ",percent_good(P,Y))
+            print(c, " | ",mae(P,Y))
             #print(P,Y)
             self.NN.backward(Y, lr=self.lr)
         print("\n")
 
 
-def percent_good(predictions: np.array, observations: np.array):
-    assert(predictions.shape==observations.shape),\
-        f"""you dun goofed up {predictions.shape}!={observations.shape}"""
-    observations = np.argmax(observations, axis=1)
-    predictions = np.argmax(predictions, axis=1)
-    missed = 0
-    for o,p in zip(observations, predictions):
-        if o!=p:
-            missed+=1
-    accuracy = 100*(predictions.shape[0]-missed)/predictions.shape[0]
-    return accuracy
+
 
 # learning rate, dropout, momentum
 
 
 if __name__ == "__main__":
-    batch_size = 48
-    learning_rate = 0.01
-    learning_rate_stop = 0.01
+    batch_size = 96
+    learning_rate = 0.02
+    learning_rate_stop = 0.1
     nn = NeuralNetwork([DenseLayer(89, 784, Tanh, batch_size=batch_size),
                         #DenseLayer(89, 89, ReLu, batch_size=batch_size),
                         DenseLayer(16,89, Id, batch_size=batch_size)],
-                       CLASSES, cross_entropy_cost,Softmax, batch_size=batch_size)
+                       CLASSES, cross_entropy_cost, Softmax, batch_size=batch_size)
     SGD = Trainer(nn, learning_rate, learning_rate_stop)
-    SGD.train(epochs=2000)
+    SGD.train(epochs=500)
     SGD.train(epochs=1)
     #P = np.array([[0.1,0.3,0.2],
     #              [0.8,0.6,0.3],

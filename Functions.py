@@ -3,7 +3,7 @@ from typing import Callable
 
 
 def derivative(f: Callable, epsilon: float = 1.0e-6, domain: np.ndarray=np.linspace(-10,10,200)):
-    print(domain, len(list(domain)))
+    #print(domain, len(list(domain)))
     lst = [(f(x+epsilon)-(f(x-epsilon)))/(2*epsilon) for x in list(domain)]
     return np.array(lst)
 
@@ -78,7 +78,29 @@ def cross_entropy_cost(predictions: np.array, labels: np.array) -> float:
     
     return cost
 
+def mae(preds: np.array, actuals: np.array):
+    '''
+    Compute mean absolute error.
+    '''
+    return np.mean(np.abs(preds - actuals))
 
+def rmse(preds: ndarray, actuals: ndarray):
+    '''
+    Compute root mean squared error.
+    '''
+    return np.sqrt(np.mean(np.power(preds - actuals, 2)))
+
+def percent_good(predictions: np.array, observations: np.array):
+    assert(predictions.shape==observations.shape),\
+        f"""you dun goofed up {predictions.shape}!={observations.shape}"""
+    observations = np.argmax(observations, axis=1)
+    predictions = np.argmax(predictions, axis=1)
+    missed = 0
+    for o,p in zip(observations, predictions):
+        if o!=p:
+            missed+=1
+    accuracy = 100*(predictions.shape[0]-missed)/predictions.shape[0]
+    return accuracy
 
 #draft, useless for now
 def standardize(x: np.ndarray):
@@ -91,5 +113,7 @@ if __name__=="__main__":
                         [0.8, 0.8, 0.8]])
     labels = np.array([[1., 1., 0.],
                        [0., 0., 1.]])
-    print(Softmax.derive(final_z, labels))
+    grads = np.array([[-0.32282815, -0.32282815,  0.17717185],
+                     [ 0.32282815 , 0.32282815 ,-0.17717185]])
+    print(Id.derive(grads))
     #print(cross_entropy_cost(final_z, labels))

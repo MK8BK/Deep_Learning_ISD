@@ -9,6 +9,8 @@ class NeuralNetwork:
                         classes: list, C: Callable, L: LossFunction,
                         batch_size: int=32):
         self.layers = layers
+        self.W = {}
+        self.b = {}
         self.batch_size = batch_size
         self.classes = classes
         self.C = C
