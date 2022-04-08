@@ -46,9 +46,9 @@ Deep learning en python, implementation avec la librairie de calcul numerique Nu
 
 ## Détails du travail effectué :
 
-[travail actuel](https://github.com/MK8BK/Classification_Hex_lddim2/tree/master/model)
+[travail actuel](https://github.com/MK8BK/Deep_Learning_ISD/tree/master/model)
 
-[aspects theoriques](https://github.com/MK8BK/Classification_Hex_lddim2/blob/master/docs/draft.pdf)
+[aspects theoriques](https://github.com/MK8BK/Deep_Learning_ISD/blob/master/docs/draft.pdf)
 
 A completer plus tard
 
