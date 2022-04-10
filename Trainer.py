@@ -2,48 +2,27 @@ from LoadData import *
 from NeuralNetwork import *
 from os import system
 
-class Trainer:
-
-    def __init__(self, NN: NeuralNetwork, lr: float, lr_stop: float,
-                 lr_decay: str = 'exponential', momentum: float = 0.9, dropout: bool = False):
-        #    assert(lr_decay=="exponential" or lr_decay=="linear"),\
-        #        f"""learning rate decay not implemented: '{lr_decay}'"""
-        self.NN = NN
-        self.lr = lr
-        self.lr_stop = lr_stop
-        self.lr_decay = lr_decay
-        self.momentum = momentum
-        self.dropout = dropout
-
-    def train(self, epochs: int = 50):
-        for i in range(epochs):
-            X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=self.NN.batch_size,
-                                 classes=CLASSES, equilibrium=True)
-            P = self.NN.forward(X)
-            if i%20==0:
-                c = self.NN.compute_cost(P, Y)
-                print(c, " | ",rmse(P,Y))
-            #print(P,Y)
-            self.NN.backward(Y, lr=self.lr)
-        print("\n")
-
-
 
 
 # learning rate, dropout, momentum
 
 
 if __name__ == "__main__":
-    batch_size = 32
-    learning_rate = 0.01
-    learning_rate_stop = 0.1
-    nn = NeuralNetwork([DenseLayer(89, 784, Tanh, batch_size=batch_size),
-                        #DenseLayer(89, 89, ReLu, batch_size=batch_size),
-                        DenseLayer(16,89, Id, batch_size=batch_size, p=True)],
-                       CLASSES, cross_entropy_cost, Softmax, batch_size=batch_size)
-    SGD = Trainer(nn, learning_rate, learning_rate_stop)
-    SGD.train(epochs=500)
-    SGD.train(epochs=1)
+    batch_size = 160
+    lr = 0.01
+    SCE = SoftmaxCrossEntropyLoss()
+    layers = [DenseActivatedLayer(112, 784, ReLu), 
+        DenseActivatedLayer(112, 112, ReLu),
+        OuputLayer(16, 112, SCE)]
+
+    nn = NeuralNetwork(layers, classes=CLASSES)
+    #comprends pas pk ca marche pas, tu peux checker ?
+    for i in range(100):
+        X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
+                             classes=CLASSES, equilibrium=True)
+        nn.forward(X)
+        print(nn.backward(Y))
+
     #P = np.array([[0.1,0.3,0.2],
     #              [0.8,0.6,0.3],
     #              [0.1,0.1,0.5]])

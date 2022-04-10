@@ -17,88 +17,82 @@ def chain_derivative(functions: list[Callable], epsilon: float = 1.0e-6, domaine
     return list(product)
 
 
-class Function:
-    def __init__(self, fn: Callable, dfn: Callable=None):
+class Activation:
+    def __init__(self, fn, dfn):
         self.fn = fn
         self.dfn = dfn
-    def output(self, x: np.ndarray):
-        return self.fn(x)
-    def derive(self, x: np.ndarray, 
-                labels: np.array=np.array([])):
-        if self.dfn==None:
-            return derivative(self.fn, domain=x)
-        return self.dfn(x)
+
+    def forward(self, X):
+        return self.fn(X)
+
+    def backward(self, X):
+        return self.dfn(X)
 
 
 #ReLu, tanh, sigmoid, weight evaluation, matrix operations, bias addition
-ReLu = Function(lambda x: np.maximum(0,x), lambda x: 1.0*(x>0))
+ReLu = Activation(lambda x: np.maximum(0,x),
+    lambda x: 1.0*(x>0))
 
 
-Sigmoid = Function(lambda x: 1.0/(1.0+np.exp(-x)), lambda x:(1.0/(1.0+np.exp(-x)))*(1- 1.0/(1.0+np.exp(-x))))
+Sigmoid = Activation(lambda x: 1.0/(1.0+np.exp(-x)),
+    lambda x:(1.0/(1.0+np.exp(-x)))*(1- 1.0/(1.0+np.exp(-x))))
 
 
-Tanh = Function(lambda x:(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)),
+Tanh = Activation(lambda x:(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)),
                 lambda x:1-((np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)))**2)
 
-Id = Function(lambda x: x, lambda x: 1)
-
-class LossFunction(Function):
-    def __init__(self, fn: Callable, dfn: Callable):
-        self.fn = fn
-        self.dfn = dfn
-    def derive(self, x: np.ndarray, labels: np.array)->np.array:
-        assert(x.shape == labels.shape),\
-            f"""different shapes: predictions:{x.shape}
-                                  labels     :{labels.shape}"""
-        return self.dfn(x, labels)
+#Id = Activation(lambda x: x, lambda x: 1)
 
 
-#softmax per column
-def s(x):
-    return np.exp(x) / np.sum(np.exp(x), axis=0)
-def ds(predictions, labels):
-    return (1./len(predictions))*(-(labels/predictions) + ((1 - labels)/(1 - predictions)))
+def softmax(X, axis=0):
+    X = X - np.max(X, axis=axis)
+    return np.exp(X)/np.sum(np.exp(X), axis=axis)
 
-Softmax = LossFunction(s,ds)
+class Loss:
+    def __init__(self):
+        pass
+    def forward(self, X):
+        pass
+    def compute_cost(self, Y):
+        pass
+    def backward(self):
+        pass
 
-#cross entropy cost for mini-batch
-def cross_entropy_cost(predictions: np.array, labels: np.array) -> float:
-    #assert same shape
-    assert(predictions.shape==labels.shape),\
-            f"""different shapes: predictions:{predictions.shape}
-                                  labels     :{labels.shape}"""
-    
-    #avoid log(0)
-    predictions = np.clip(predictions, 1.e-9, 1 - 1.e-9)
-    
-    #compute cost
-    logprobs = labels * np.log(predictions) + (1-labels) * np.log(1 - predictions)
-    cost = (-1/float(labels.shape[1])) * np.sum(logprobs)
-    
-    return cost
+class SoftmaxCrossEntropyLoss(Loss):
+    def __init__(self, eps: float=1e-9):
+        super().__init__()
+        self.eps = eps
+    def forward(self, X):
+        self.P = softmax(X, axis=0)
+        return self.P
+    def compute_cost(self, Y):
+        self.Y = Y
+        self.P = np.clip(self.P, self.eps, 1 - self.eps)
+        loss = (-1.0 * Y * np.log(self.P) - \
+            (1.0 - Y) * np.log(1 - self.P))
+        return np.sum(loss)
+    def backward(self):
+        return self.P - self.Y
 
-def mae(preds: np.array, actuals: np.array):
-    '''
-    Compute mean absolute error.
-    '''
-    return np.mean(np.abs(preds - actuals))
 
-def rmse(preds: np.array, actuals: np.array):
-    '''
-    Compute root mean squared error.
-    '''
-    return np.sqrt(np.mean(np.power(preds - actuals, 2)))
 
-def percent_good(predictions: np.array, observations: np.array):
-    assert(predictions.shape==observations.shape),\
-        f"""you dun goofed up {predictions.shape}!={observations.shape}"""
-    observations = np.argmax(observations, axis=1)
-    predictions = np.argmax(predictions, axis=1)
+def MeanAbsoluteError(P, Y):
+    return np.mean(np.abs(P - Y))
+
+def MeanSquaredError(P, Y):
+    return np.mean(np.power(P - Y, 2))
+
+def RootMeanSquaredError(P, Y):
+    return np.sqrt(MeanSquaredError(P,Y))
+
+def percent_good(P, Y):
+    Y = np.argmax(Y, axis=1)
+    P = np.argmax(P, axis=1)
     missed = 0
-    for o,p in zip(observations, predictions):
+    for o,p in zip(Y, P):
         if o!=p:
             missed+=1
-    accuracy = 100*(predictions.shape[0]-missed)/predictions.shape[0]
+    accuracy = 100*(P.shape[0]-missed)/P.shape[0]
     return accuracy
 
 #draft, useless for now
@@ -108,11 +102,14 @@ def standardize(x: np.ndarray):
 
 
 if __name__=="__main__":
-    final_z = np.array([[0.2, 0.2, 0.2],
-                        [0.8, 0.8, 0.8]])
+    final_z = np.array([[0.91, 0.2, 0.2],
+                        [0.9, 0.8, 0.8]])
     labels = np.array([[1., 1., 0.],
                        [0., 0., 1.]])
     grads = np.array([[-0.32282815, -0.32282815,  0.17717185],
                      [ 0.32282815 , 0.32282815 ,-0.17717185]])
-    print(Id.derive(grads))
+    SCE = SoftmaxCrossEntropyLoss()
+    print(SCE.forward(grads))
+    #print(SCE.compute_cost(labels))
+    #print(SCE.backward())
     #print(cross_entropy_cost(final_z, labels))
