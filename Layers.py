@@ -63,7 +63,7 @@ class DenseActivatedLayer(DenseLinearLayer):
                                      A_of_z:  {self.A_of_z.shape}"""
         #dE/Z = dE/dA(Z) * dA(Z)/dZ
         #produit hadamard
-        dZ = np.multiply(dA_of_Z, self.A.backward(self.Z))
+        dZ = dA_of_Z*self.A.backward(self.Z)
         assert(dZ.shape == dA_of_Z.shape)
         dX = super().backward(dZ, lr) 
         return dX

@@ -9,27 +9,22 @@ from NeuralNetwork import *
     #il est preferable de mettre sqrt(784*16) neurones
 
 if __name__ == "__main__":
-    batch_size = 48
+    batch_size = 64
     lr = 0.1
     SCE = SoftmaxCrossEntropyLoss()
-    layers = [DenseActivatedLayer(112, 784, Sigmoid), 
-        DenseActivatedLayer(112, 112, Sigmoid),
+    layers = [DenseActivatedLayer(112, 784, ReLu), 
+        #DenseActivatedLayer(112, 112, ReLu),
         OuputLayer(16, 112, SCE)]
 
     nn = NeuralNetwork(layers, classes=CLASSES)
-    #print(CLASSES)
-    #comprends pas pk ca marche pas, tu peux checker ?
-    for i in range(100):
+    for i in range(600):
         #X.shape = (784,32)
         X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
                              classes=CLASSES, equilibrium=True)
         nn.forward(X)
-        print(nn.backward(Y))
-        #print(lr)
-        #lr*=lr
-    #X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
-    #                     classes=CLASSES, equilibrium=True)
-    #nn.forward(X)
-    #print(nn.backward(Y))
+        cost, percent = nn.backward(Y)
+        if i%30==0:
+#            print(f"cost: {cost}  | accuracy: {percent}")
+            print(f"Iteration: {i:3} | Accuracy: {percent}") 
 
     #print(f"Empty main in : '{__file__[-10:]}'")

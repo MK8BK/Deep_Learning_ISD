@@ -58,16 +58,16 @@ class SoftmaxCrossEntropyLoss():
         self.Y = Y
         self.P = np.clip(self.P, self.eps, 1 - self.eps)
         #a modifier, \ na pas sa place ici
-        loss = (-1.0 * Y * np.log(self.P) - \
-            (1.0 - Y) * np.log(1 - self.P))
-        return np.sum(loss)
+        loss = (-1.0 * Y * np.log(self.P) - (1.0 - Y) * np.log(1 - self.P))
+        return np.squeeze(np.nansum(loss))
     def backward(self):
         grad = self.P - self.Y
+        #grad = ()
+        #grad = (-(self.Y / self.P) + ((1 - self.Y) / (1 - self.P))) / self.P.shape[1]
         return grad
         #matrice jacobienne
         #  
 # n = len(self.real)
-#        return (-(self.real / self.predicted) + ((1 - self.real) / (1 - self.predicted))) / n
 
 
 def MeanAbsoluteError(P, Y):
@@ -104,6 +104,6 @@ if __name__=="__main__":
                      [ 0.32282815 , 0.32282815 ,-0.17717185]])
     SCE = SoftmaxCrossEntropyLoss()
     print(SCE.forward(grads))
-    #print(SCE.compute_cost(labels))
+    print(SCE.compute_cost(labels))
     #print(SCE.backward())
     #print(cross_entropy_cost(final_z, labels))

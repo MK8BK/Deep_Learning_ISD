@@ -57,7 +57,7 @@ def load_numpy_image(str_path: str) -> np.array:
     """
     pil_img = load_pil_image(str_path)
     h,w = pil_img.size
-    return np.array(pil_img).reshape(1,h*w)/255.
+    return np.array(pil_img).flatten(order="F")/255.
 
 
 def make_input_matrix(samples: list[np.array]) -> np.array:
@@ -95,15 +95,17 @@ def make_labels_matrix(labels: list[str], classes: list[int]) -> np.array:
         @param: labels: a list of strings, all part of global CLASSES
         @return: classes: the global CLASSES list
     """
+    #print(len(labels))
     labels_matrix = np.zeros((len(classes), len(labels)))
     labels = make_labels(labels)
-    for i,label in zip(range(len(classes)), labels):
-        labels_matrix[label][i] = 1.
-    return labels_matrix
+    for label, i in zip(labels, range(len(labels))):
+        labels_matrix[label, i] = 1
+    #labels_matrix.dtype = int
+    return labels_matrix.astype("int32")
 
 
 def make_random_batch(path: str, batch_size: int, classes: list[str],
-                                        equilibrium: bool=True)->list[str]:
+                        equilibrium: bool=True)->list[str]:
     """
         Returns a list of filenames randomly, equal per class or not
         @param: path: the path to the data_set folder
@@ -177,9 +179,10 @@ def split_data(X: np.array, Y: np.array,
 
 if __name__ == "__main__":
     #help(make_labels)
-    X, Y = load_data_set("EMNIST_DATA_SET/", batch_size=20,
+    X, Y = load_data_set("EMNIST_DATA_SET/", batch_size=3,
                             classes=CLASSES, equilibrium=False)
-    print(X, "\n\n", Y, "\n")
-    X_test, Y_test, X_train, Y_train = split_data(X, Y, percent_test=25)
-    print(X_test.shape, "\n", Y_test.shape, "\n", X_train.shape, "\n", Y_train.shape)
+    #print(Y)
+    #print(X, "\n\n", Y, "\n")
+    #X_test, Y_test, X_train, Y_train = split_data(X, Y, percent_test=25)
+    #print(X_test.shape, "\n", Y_test.shape, "\n", X_train.shape, "\n", Y_train.shape)
     print("No errors")
