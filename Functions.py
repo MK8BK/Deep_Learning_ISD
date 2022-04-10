@@ -45,7 +45,7 @@ Tanh = Activation(lambda x:(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)),
 
 
 def softmax(X, axis=0):
-    X = X - np.max(X, axis=axis)
+    #X = X - np.max(X, axis=axis)
     return np.exp(X)/np.sum(np.exp(X), axis=axis)
 
 class Loss:
@@ -72,8 +72,11 @@ class SoftmaxCrossEntropyLoss(Loss):
             (1.0 - Y) * np.log(1 - self.P))
         return np.sum(loss)
     def backward(self):
-        return self.P - self.Y
+        grad = self.P - self.Y
+        return grad
 
+# n = len(self.real)
+#        return (-(self.real / self.predicted) + ((1 - self.real) / (1 - self.predicted))) / n
 
 
 def MeanAbsoluteError(P, Y):

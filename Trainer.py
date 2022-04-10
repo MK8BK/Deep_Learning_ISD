@@ -9,7 +9,7 @@ from os import system
 
 if __name__ == "__main__":
     batch_size = 48
-    lr = 1
+    lr = 0.1
     SCE = SoftmaxCrossEntropyLoss()
     layers = [DenseActivatedLayer(112, 784, ReLu), 
         DenseActivatedLayer(112, 112, ReLu),
@@ -17,13 +17,13 @@ if __name__ == "__main__":
 
     nn = NeuralNetwork(layers, classes=CLASSES)
     #comprends pas pk ca marche pas, tu peux checker ?
-    for i in range(100):
+    for i in range(200):
         X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
                              classes=CLASSES, equilibrium=True)
         nn.forward(X)
         nn.backward(Y)
         #print(lr)
-        lr*=0.9999
+        #lr*=lr
     X, Y = load_data_set("./EMNIST_DATA_SET/", batch_size=batch_size,
                          classes=CLASSES, equilibrium=True)
     nn.forward(X)

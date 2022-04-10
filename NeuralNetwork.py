@@ -12,10 +12,12 @@ class NeuralNetwork:
         res = X
         for layer in self.layers:
             res = layer.forward(res)
+        self.res = res
         return res
     def backward(self, Y, lr=0.01):
         grad = Y
-        percent = percent_good(self.layers[-1].A_of_z, Y)
+        #self.layers[-1].A_of_z
+        percent = percent_good(self.res, Y)
         grad, cost = self.layers[-1].backward(Y, lr)
         for layer in reversed(self.layers[:-1]):
             grad = layer.backward(grad, lr=lr)
