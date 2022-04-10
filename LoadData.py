@@ -6,8 +6,8 @@ from PIL import Image, ImageOps
 
 
 #global classes list
-CLASSES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-            "A", "B", "C", "D", "E", "F"]
+CLASSES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+            , "A", "B", "C", "D", "E", "F"]
 
 
 def char_to_label(character: str) -> int:

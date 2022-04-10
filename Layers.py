@@ -4,7 +4,7 @@ class DenseLinearLayer:
     def __init__(self, N: int, F: int):
         self.N = N
         self.F = F
-        self.W = np.random.randn(self.N, self.F) * 0.01#np.sqrt(2/self.F)
+        self.W = np.random.randn(self.N, self.F) * (2/(self.F+self.N))
         self.B = np.zeros((self.N,1))
 
     def forward(self, X: np.array) -> np.array:
@@ -66,6 +66,7 @@ class OuputLayer(DenseLinearLayer):
         cost = self.C.compute_cost(Y)
         dA_of_Z = self.C.backward()
         dX = super().backward(dA_of_Z,lr)
+        #print(self.W)
         return dX, cost
 
 #    def __init__(self, predicted, real):
