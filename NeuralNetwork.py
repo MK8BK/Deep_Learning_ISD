@@ -15,10 +15,11 @@ class NeuralNetwork:
         return res
     def backward(self, Y, lr=0.01):
         grad = Y
+        percent = percent_good(self.layers[-1].A_of_z, Y)
         grad, cost = self.layers[-1].backward(Y, lr)
         for layer in reversed(self.layers[:-1]):
             grad = layer.backward(grad, lr=lr)
-        return cost
+        return cost, percent
 
 if __name__=="__main__":
     print(f"Empty main in : '{__file__[-16:]}'")

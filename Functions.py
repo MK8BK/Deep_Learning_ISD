@@ -86,14 +86,14 @@ def RootMeanSquaredError(P, Y):
     return np.sqrt(MeanSquaredError(P,Y))
 
 def percent_good(P, Y):
-    Y = np.argmax(Y, axis=1)
-    P = np.argmax(P, axis=1)
+    Y = np.argmax(Y, axis=0)
+    P = np.argmax(P, axis=0)
     missed = 0
     for o,p in zip(Y, P):
         if o!=p:
             missed+=1
     accuracy = 100*(P.shape[0]-missed)/P.shape[0]
-    return accuracy
+    return str(accuracy)+' %'
 
 #draft, useless for now
 def standardize(x: np.ndarray):
