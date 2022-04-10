@@ -1,5 +1,15 @@
 from Functions import *
 
+
+
+#Z = WX + B
+#W: matrice des poids
+# dimensions: (N, F)
+#X: matrice des entrees (input features)
+# dimensions: (F, S)
+#B: vecteur colonne
+#   dimensions: (N, 1)
+
 class DenseLinearLayer:
     def __init__(self, N: int, F: int):
         self.N = N
@@ -17,18 +27,23 @@ class DenseLinearLayer:
         return self.Z
 
     def backward(self, dZ: np.array, lr)->np.array:
+        #
         dZ = np.atleast_2d(dZ)
         assert(dZ.shape == self.Z.shape),\
-            f"""Incompatible shapes: dA_of_Z: {dA_of_Z.shape} 
-                                     A_of_z:  {self.A_of_z.shape}"""
+            f"""Incompatible shapes: dZ: {dZ.shape} 
+                                     Z:  {self.Z.shape}"""
+        #dE/dZ = dZ
+        #dE/dX = dE/dZ * dZ/dX
+        #    Z = WX+B
+        #dE/dB = dE/dZ * dZ/dB
+        #    Z = 1*B
         dW = np.dot(dZ, self.X.T)#*(1./self.S)
         dB = dZ.mean(axis=1, keepdims=True)
         dX = np.dot(self.W.T, dZ)
+        #DESCENTE
         self.W = self.W - lr*dW
         self.B = self.B - lr*dB
         return dX
-
-
 
 class DenseActivatedLayer(DenseLinearLayer):
     def __init__(self, N, F, A):
@@ -36,7 +51,8 @@ class DenseActivatedLayer(DenseLinearLayer):
         self.A = A
 
     def forward(self, X: np.array) -> np.array:
-        Z = super().forward(X)
+        #Z = 
+        super().forward(X)
         self.A_of_z = self.A.forward(self.Z)
         return self.A_of_z
 
@@ -45,6 +61,8 @@ class DenseActivatedLayer(DenseLinearLayer):
         assert(dA_of_Z.shape == self.Z.shape),\
             f"""Incompatible shapes: dA_of_Z: {dA_of_Z.shape} 
                                      A_of_z:  {self.A_of_z.shape}"""
+        #dE/Z = dE/dA(Z) * dA(Z)/dZ
+        #produit hadamard
         dZ = np.multiply(dA_of_Z, self.A.backward(self.Z))
         assert(dZ.shape == dA_of_Z.shape)
         dX = super().backward(dZ, lr) 
@@ -56,9 +74,8 @@ class OuputLayer(DenseLinearLayer):
         self.C = C
 
     def forward(self, X):
-        Z = super().forward(X)
-        self.Z = Z
-        self.A_of_z = self.C.forward(Z)
+        super().forward(X)
+        self.A_of_z = self.C.forward(self.Z)
         return self.A_of_z
 
     # use super().forward()
@@ -68,6 +85,13 @@ class OuputLayer(DenseLinearLayer):
         dX = super().backward(dA_of_Z,lr)
         #print(self.W)
         return dX, cost
+
+
+#class DenseLinearLayer
+#    class DenseActivatedLayer
+#    class OutputLayer
+
+
 
 #    def __init__(self, predicted, real):
 #        self.real = real

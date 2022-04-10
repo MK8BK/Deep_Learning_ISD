@@ -1,8 +1,7 @@
-import pickle
+#import pickle
 from Functions import *
 from Layers import *
 
-#have'nt decided how constructor should work (list of int, DanseLayer, or else)
 class NeuralNetwork:
 
     def __init__(self, layers, classes):

@@ -48,19 +48,8 @@ def softmax(X, axis=0):
     #X = X - np.max(X, axis=axis)
     return np.exp(X)/np.sum(np.exp(X), axis=axis)
 
-class Loss:
-    def __init__(self):
-        pass
-    def forward(self, X):
-        pass
-    def compute_cost(self, Y):
-        pass
-    def backward(self):
-        pass
-
-class SoftmaxCrossEntropyLoss(Loss):
+class SoftmaxCrossEntropyLoss():
     def __init__(self, eps: float=1e-9):
-        super().__init__()
         self.eps = eps
     def forward(self, X):
         self.P = softmax(X, axis=0)
@@ -68,13 +57,15 @@ class SoftmaxCrossEntropyLoss(Loss):
     def compute_cost(self, Y):
         self.Y = Y
         self.P = np.clip(self.P, self.eps, 1 - self.eps)
+        #a modifier, \ na pas sa place ici
         loss = (-1.0 * Y * np.log(self.P) - \
             (1.0 - Y) * np.log(1 - self.P))
         return np.sum(loss)
     def backward(self):
         grad = self.P - self.Y
         return grad
-
+        #matrice jacobienne
+        #  
 # n = len(self.real)
 #        return (-(self.real / self.predicted) + ((1 - self.real) / (1 - self.predicted))) / n
 
