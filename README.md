@@ -46,9 +46,9 @@ Deep learning en python, implementation avec la librairie de calcul numerique Nu
 
 ## Détails du travail effectué :
 
-[travail actuel](https://github.com/MK8BK/Deep_Learning_ISD/tree/master/model)
+[demo non finale du travail actuel](https://github.com/MK8BK/Deep_Learning_ISD/blob/master/demo.ipynb)
 
-[aspects theoriques](https://github.com/MK8BK/Deep_Learning_ISD/blob/master/docs/draft.pdf)
+[aspects theoriques (a revoir)](https://github.com/MK8BK/Deep_Learning_ISD/blob/master/docs/draft.pdf)
 
 A completer plus tard
 

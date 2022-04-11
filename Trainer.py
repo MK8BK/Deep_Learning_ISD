@@ -38,6 +38,8 @@ if __name__ == "__main__":
     plt.yticks(list(range(0,101,10)), ytickss)
     plt.plot([0,1201],[75,75], color="red")
     plt.show()
-    with open('nn.pkl', 'wb') as outp:
-        pickle.dump(nn, outp, pickle.HIGHEST_PROTOCOL)
+    
+    #with open('nn.pkl', 'wb') as outp:
+    #    pickle.dump(nn, outp, pickle.HIGHEST_PROTOCOL)
+    
     #print(f"Empty main in : '{__file__[-10:]}'")
