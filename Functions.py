@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Callable
-
+from LoadData import *
 
 def derivative(f: Callable, epsilon: float = 1.0e-6, domain: np.ndarray=np.linspace(-10,10,200)):
     #print(domain, len(list(domain)))
@@ -30,8 +30,11 @@ class Activation:
 
 
 #ReLu, tanh, sigmoid, weight evaluation, matrix operations, bias addition
-ReLu = Activation(lambda x: np.maximum(0,x),
-    lambda x: 1.0*(x>0))
+def r(x):
+    return np.maximum(0,x)
+def rb(x):
+    return 1.0*(x>0)
+ReLu = Activation(r,rb)
 
 
 Sigmoid = Activation(lambda x: 1.0/(1.0+np.exp(-x)),
@@ -87,7 +90,19 @@ def percent_good(P, Y):
         if o!=p:
             missed+=1
     accuracy = 100*(P.shape[0]-missed)/P.shape[0]
-    return str(accuracy)+' %'
+    return accuracy
+
+
+def binarize(P):
+    maxvals = np.argmax(P, axis=0)
+    P = np.zeros(P.shape)
+    for i in range(len(maxvals)):
+        P[maxvals[i], i] = 1
+    return P
+
+def predictions(P):
+    maxvals = np.argmax(P, axis=0)
+    return [label_to_char(maxval) for maxval in maxvals]
 
 #draft, useless for now
 def standardize(x: np.ndarray):

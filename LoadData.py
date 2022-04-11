@@ -73,7 +73,6 @@ def make_input_matrix(samples: list[np.array]) -> np.array:
         assert(sample_shape==sample.shape), \
             f"""samples of different shape: sample 0       : {sample_shape}
                                             other sample   : {sample.shape}"""
-
     input_matrix = np.concatenate(samples).reshape((-1, len(samples)), order="F")
     return input_matrix
 
@@ -149,7 +148,12 @@ def load_data_set(path_str: str, batch_size: int, classes: list[str],
     Y = make_labels_matrix(files, classes)
     return X,Y
 
-
+def load_image(path_str, classes):
+    im = load_pil_image(path_str)
+    nim = load_numpy_image(path_str).reshape((im.width*im.height, 1))
+    x = make_input_matrix([nim])
+    y = make_labels_matrix([path_str], classes)
+    return (x, y, nim, im)
 #Draft of normalization, might be useful
 #X_train, X_test = X_train - np.mean(X_train), X_test - np.mean(X_train)
 #X_train, X_test = X_train / np.std(X_train), X_test / np.std(X_train)
