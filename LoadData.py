@@ -152,8 +152,8 @@ def load_image(path_str, classes):
     im = load_pil_image(path_str)
     nim = load_numpy_image(path_str).reshape((im.width*im.height, 1))
     x = make_input_matrix([nim])
-    y = make_labels_matrix([path_str], classes)
-    return (x, y, nim, im)
+    #y = make_labels_matrix([path_str], classes)
+    return (x, nim, im)
 #Draft of normalization, might be useful
 #X_train, X_test = X_train - np.mean(X_train), X_test - np.mean(X_train)
 #X_train, X_test = X_train / np.std(X_train), X_test / np.std(X_train)
