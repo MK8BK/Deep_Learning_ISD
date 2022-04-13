@@ -1,6 +1,6 @@
-#import pickle
-from Functions import *
-from Layers import *
+from src.Functions import *
+from src.Layers import *
+import numpy as np
 
 class NeuralNetwork:
 
@@ -16,11 +16,15 @@ class NeuralNetwork:
     def backward(self, Y, lr=0.01):
         grad = Y
         #self.layers[-1].A_of_z
-        percent = percent_good(self.res, Y)
-        grad, cost = self.layers[-1].backward(Y, lr)
+        grad = self.layers[-1].backward(Y, lr)
         for layer in reversed(self.layers[:-1]):
             grad = layer.backward(grad, lr=lr)
-        return cost, percent
+        return None
+
+
+#self.layers[-1].A_of_z
+#percent = percent_good(self.res, Y)
+
 
 if __name__=="__main__":
     print(f"Empty main in : '{__file__[-16:]}'")

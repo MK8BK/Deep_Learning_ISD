@@ -53,11 +53,11 @@ def load_numpy_image(str_path: str) -> np.array:
         Returns the flattened numpy representation of an image 
                             given the full relative str_path
         @param: str_path: the full relative str_path to the image file
-        @return: im: a normalized np.array of dimensions (1,h*w)
+        @return: im: a normalized np.array of dimensions (h*w,1)
     """
     pil_img = load_pil_image(str_path)
     h,w = pil_img.size
-    return np.array(pil_img).flatten(order="F")/255.
+    return np.array(pil_img).flatten(order="F").reshape((h*w,1))/255.
 
 
 def make_input_matrix(samples: list[np.array]) -> np.array:
@@ -87,7 +87,7 @@ def make_labels(filenames: list[str]) -> np.array:
     return labels
 
 
-def make_labels_matrix(labels: list[str], classes: list[int]) -> np.array:
+def make_labels_matrix(labels: list[str], classes: list[int]=CLASSES) -> np.array:
     """
         Returns the matrix representation of the labels, 
                             given a list of char labels
@@ -140,7 +140,7 @@ def make_random_batch(path: str, batch_size: int, classes: list[str],
         batch = [listChoice(imgs) for i in range(batch_size)]
         return batch
 
-def load_data_set(path_str: str, batch_size: int, classes: list[str],
+def load_training_set(path_str: str, batch_size: int, classes: list[str],
                             equilibrium: bool=True) -> list[np.array]:
     files = make_random_batch(path_str, batch_size, classes, equilibrium)
     samples = [load_numpy_image(file) for file in files]
@@ -148,45 +148,32 @@ def load_data_set(path_str: str, batch_size: int, classes: list[str],
     Y = make_labels_matrix(files, classes)
     return X,Y
 
-def load_image(path_str, classes):
+def load_prediction_image(path_str):
     im = load_pil_image(path_str)
     nim = load_numpy_image(path_str).reshape((im.width*im.height, 1))
     x = make_input_matrix([nim])
-    #y = make_labels_matrix([path_str], classes)
-    return (x, nim, im)
-#Draft of normalization, might be useful
-#X_train, X_test = X_train - np.mean(X_train), X_test - np.mean(X_train)
-#X_train, X_test = X_train / np.std(X_train), X_test / np.std(X_train)
+    y = make_labels_matrix([path_str])
+    return (x, nim, im, y)
 
-def split_data(X: np.array, Y: np.array, 
-                percent_test: int=30) -> tuple[np.array, np.array,
-                                                np.array, np.array]:
-    
-    #assert same number of samples and labels
-    assert(X.shape[1]==Y.shape[1]), \
-        f"Y labels of {Y.shape[1]} samples dont match X data of {X.shape[1]} samples"
+def load_data_set(path_str):
+    directories = listdir(path_str)
+    imgs_per_directory = [listdir(path_str+directory) for directory in directories]
+    imgs = [path_str+img[0]+'/'+img for directory in imgs_per_directory 
+            for img in directory]
+    samples = [load_numpy_image(file) for file in imgs]
+    X = make_input_matrix(samples)
+    Y = make_labels_matrix(imgs)
+    return X, Y
 
-    m = X.shape[1]
-    test_samples = int((m*percent_test)/100)
-    X_test = np.zeros((X.shape[0], test_samples))
-    X_train = X
-    Y_test = np.zeros((Y.shape[0], test_samples))
-    Y_train = Y
-    for i in range(test_samples):
-        to_be_removed = listChoice(list(range(X_train.shape[1])))
-        X_test[:, i] = X_train[:, to_be_removed]
-        X_train = np.delete(X_train, i, 1)
-        Y_test[:, i] = Y_train[:, to_be_removed]
-        Y_train = np.delete(Y_train, i, 1)
 
-    return X_test, Y_test, X_train, Y_train
+
 
 if __name__ == "__main__":
     #help(make_labels)
-    X, Y = load_data_set("EMNIST_DATA_SET/", batch_size=3,
-                            classes=CLASSES, equilibrium=False)
+    X, Y = load_data_set("EMNIST_DATA_SET/")
+    print(X.shape, Y.shape)
     #print(Y)
     #print(X, "\n\n", Y, "\n")
     #X_test, Y_test, X_train, Y_train = split_data(X, Y, percent_test=25)
     #print(X_test.shape, "\n", Y_test.shape, "\n", X_train.shape, "\n", Y_train.shape)
-    print("No errors")
+    #print("No errors")

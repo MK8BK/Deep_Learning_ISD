@@ -1,21 +1,8 @@
 from typing import Callable, Iterable, Optional
 from PIL import Image
 from matplotlib.figure import Figure
-import math
-
-def show_source(function: Callable) -> None:
-    """
-    Show the source code of the function, with syntax highlighting
-
-    This is meant to be called from a Jupyter notebook.
-    """
-    code = inspect.getsource(function)
-    lexer = PythonLexer()
-    formatter = HtmlFormatter(cssclass="pygments")
-    html_code = highlight(code, lexer, formatter)
-    css = formatter.get_style_defs(".pygments")
-    html = f"<style>{css}</style>{html_code}"
-    display(HTML(html))
+from math import ceil
+import inspect
 
 
 def image_grid(
@@ -32,7 +19,7 @@ def image_grid(
          >>> image_grid(images, titles=[....])
 
     """
-    rows = math.ceil(1.0 * len(images) / columns)
+    rows = ceil(1.0 * len(images) / columns)
     fig = Figure(figsize=(10, 10.0 * rows / columns))
     if titles is None:
         titles = range(len(images))
