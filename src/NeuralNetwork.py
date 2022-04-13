@@ -4,9 +4,8 @@ import numpy as np
 
 class NeuralNetwork:
 
-    def __init__(self, layers, classes):
+    def __init__(self, layers):
         self.layers = layers
-        self.classes = classes
     def forward(self, X):
         res = X
         for layer in self.layers:

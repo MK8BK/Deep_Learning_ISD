@@ -65,7 +65,7 @@ def make_input_matrix(samples: list[np.array]) -> np.array:
         Returns the matrix representation of s samples
         @param: samples: a list of flattened np.array 's, 
                         each representing a sample image
-        @return: input_matrix: a matrix containing one sample per column,
+        @return: input_matrix: a matrix (2d np.array) containing one sample per column,
                                          1 feature(pixel value) per row
     """
     sample_shape = samples[0].shape
@@ -91,15 +91,13 @@ def make_labels_matrix(labels: list[str], classes: list[int]=CLASSES) -> np.arra
     """
         Returns the matrix representation of the labels, 
                             given a list of char labels
-        @param: labels: a list of strings, all part of global CLASSES
-        @return: classes: the global CLASSES list
+        @param: labels: a list of strings, filepaths
+        @return: labels_matrix: a 2 np.array of 16 rows, each column is an image
     """
-    #print(len(labels))
     labels_matrix = np.zeros((len(classes), len(labels)))
     labels = make_labels(labels)
     for label, i in zip(labels, range(len(labels))):
         labels_matrix[label, i] = 1
-    #labels_matrix.dtype = int
     return labels_matrix.astype("int32")
 
 
@@ -141,7 +139,17 @@ def make_random_batch(path: str, batch_size: int, classes: list[str],
         return batch
 
 def load_training_set(path_str: str, batch_size: int, classes: list[str],
-                            equilibrium: bool=True) -> list[np.array]:
+                            equilibrium: bool=True) -> tuple[np.array]:
+    """
+        Returns a training input and labels matrices randomly, 
+                                        equal per class or not
+        @param: path: the path to the data_set folder
+        @param: batch_size: the number of images in the batch
+        @param: classes: a list of str representations of the classes
+        @param: equilibrium: a bool, wether or not to equalize images per class
+        @return: batch: X: an input matrix of shape (784,batch_size) 
+                        Y: a corresponding labels matrix of shape (16, batch_size)
+    """
     files = make_random_batch(path_str, batch_size, classes, equilibrium)
     samples = [load_numpy_image(file) for file in files]
     X = make_input_matrix(samples)
@@ -149,13 +157,25 @@ def load_training_set(path_str: str, batch_size: int, classes: list[str],
     return X,Y
 
 def load_prediction_image(path_str):
+    """
+        Loads a single image located at path_str
+        @param: path_str: relative path to the image
+        @return: x: a 784x1 input matrix
+                 im: PIL representation of the image
+    """
     im = load_pil_image(path_str)
     nim = load_numpy_image(path_str).reshape((im.width*im.height, 1))
     x = make_input_matrix([nim])
-    y = make_labels_matrix([path_str])
-    return (x, nim, im, y)
+    #y = make_labels_matrix([path_str])
+    return (x, im)#(x, nim, im, y)
 
 def load_data_set(path_str):
+    """
+        Loads entire data set at path_str
+        @param: path_str: root path of data_set
+        @return: X: an imput matrix of shape (784, 38400)
+                 Y: a labels matrix of shape (16, 38400)
+    """
     directories = listdir(path_str)
     imgs_per_directory = [listdir(path_str+directory) for directory in directories]
     imgs = [path_str+img[0]+'/'+img for directory in imgs_per_directory 

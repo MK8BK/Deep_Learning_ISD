@@ -3,14 +3,21 @@ from typing import Callable
 from src.LoadData import *
 
 class Activation:
+    """
+        Abstract Activation class
+    """
     def __init__(self, fn, dfn):
+        #forward pass function
         self.fn = fn
+        #backward pass function (derivative of forward pass)
         self.dfn = dfn
 
     def forward(self, x):
+        #apply forward pass function to input matrix
         return self.fn(x)
 
     def backward(self, x):
+        #apply backward pass function to input grad
         return self.dfn(x)
 
 # ReLu, tanh, sigmoid, weight evaluation, matrix operations, bias addition
