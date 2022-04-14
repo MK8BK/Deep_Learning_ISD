@@ -89,7 +89,7 @@ def make_labels(filenames: list[str]) -> np.array:
 
 def make_labels_matrix(labels: list[str], classes: list[int]=CLASSES) -> np.array:
     """
-        Returns the matrix representation of the labels, 
+        Returns the one hot encoded matrix representation of the labels, 
                             given a list of char labels
         @param: labels: a list of strings, filepaths
         @return: labels_matrix: a 2 np.array of 16 rows, each column is an image
@@ -138,7 +138,7 @@ def make_random_batch(path: str, batch_size: int, classes: list[str],
         batch = [listChoice(imgs) for i in range(batch_size)]
         return batch
 
-def load_training_set(path_str: str, batch_size: int, classes: list[str],
+def load_training_set(path_str: str, batch_size: int, classes: list[str]=CLASSES,
                             equilibrium: bool=True) -> tuple[np.array]:
     """
         Returns a training input and labels matrices randomly, 

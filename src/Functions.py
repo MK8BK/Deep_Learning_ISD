@@ -4,76 +4,96 @@ from src.LoadData import *
 
 class Activation:
     """
-        Abstract Activation class
+        Abstract Activation function class
     """
     def __init__(self, fn, dfn):
+        """
+            @param: Callable self.fn: forward pass function
+            @param: Callable self.dfn: backward pass function
+                    (derivative of forward pass function)
+        """
         #forward pass function
         self.fn = fn
         #backward pass function (derivative of forward pass)
         self.dfn = dfn
 
     def forward(self, x):
-        #apply forward pass function to input matrix
+        """
+            apply forward pass function to input matrix (2d np.array)
+            @param: x : a 2d np.array, the results of the linear part of the layer
+            @return: a 2d np.array (same shape as x), elementwise evaluation using fn
+        """
         return self.fn(x)
 
     def backward(self, x):
-        #apply backward pass function to input grad
+        """
+            apply backward pass function to input gradient matrix(2d np.array)
+            @param: x : 2d np.array , gradient of loss wrt layer output
+            @return: a 2d np.array (same shape as x), elementwise evaluation using dfn
+                    ie: gradient of error wrt linear part of layer
+        """
         return self.dfn(x)
 
 # ReLu, tanh, sigmoid, weight evaluation, matrix operations, bias addition
 
 def r(x):
+    "ReLu forward pass"
     return np.maximum(0,x)
 def rb(x):
+    "ReLu backward pass"
     return 1.0*(x>0)
 ReLu = Activation(r,rb)
 
 
 def s(x):
+    "Sigmoid forward pass"
     return 1.0/(1.0+np.exp(-x))
 def sb(x):
+    "Sigmoid backward pass"
     return s(x)*(1-s(x))
 Sigmoid = Activation(s,sb)
 
 
 def th(x):
+    "Tanh forward pass"
     return (np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x))
 def thb(x):
+    "Tanh backward pass"
     return 1-th(x)**2
 Tanh = Activation(th, thb)
 
-
-#class Softmax():
-#    def __init__(self):
-#        pass
-#    def forward(self, x, axis=0, eps=1.e-9):
-#        self.p = np.exp(x)/np.sum(np.exp(x), axis=axis)
-#        self.p = np.clip(self.p, eps, 1 - eps)
-#        return self.p
-#    def backward(self, y):
-#        return self.p - y
-
-
 class SoftmaxCrossEntropyLoss():
+    "Softmax Cross Entropy loss function wrapper class"
     def __init__(self, eps: float=1e-9, axis=0):
+        """
+            @param: optional eps = 1e-9: safety pre-log clipping precision
+            @param: optional axis = 0 (columns) 
+                                apply softmax by columns or rows of matrix
+
+        """
         self.eps = eps
         self.axis = axis
     def forward(self, x):
+        """
+            apply softmax to matrix by axis (0 columns; 1 rows)
+            @param: x : a 2d np.array, the results of the linear part of the layer
+            @return: self.p (cached for backward use), axis-wise softmax
+                        probability distribution per axis
+        """
         self.p = np.exp(x)/np.sum(np.exp(x), axis=self.axis)
         self.p = np.clip(self.p, self.eps, 1 - self.eps)    
-        #self.p = softmax(X, axis=0)
         return self.p
     def backward(self, y):
+        """
+            return gradient of loss with respect to prediction 
+                for Softmax Cross Entropy Loss function
+            @param: y : 2d np.array of labels
+            @return: softmax_preds - labels 
+                    (gradient of loss wrt linear output layer)
+        """
         self.y = y
-        #self.P = np.clip(self.P, self.eps, 1 - self.eps)
-        #a modifier, \ na pas sa place ici
-        #loss = (-1.0 * y * np.log(self.p) - (1.0 - y) * np.log(1 - self.p))
-        #loss = np.squeeze(np.nansum(loss))
-
         grad = (self.p - self.y)#/self.p.shape[1]
-        #grad = ()
-        #grad = (-(self.Y / self.P) + ((1 - self.Y) / (1 - self.P))) / self.P.shape[1]
-        return grad#, loss
+        return grad
 
 
 # def apply_momentum(past_gradients, current_gradient, momentum=0.9):
@@ -84,6 +104,13 @@ class SoftmaxCrossEntropyLoss():
 
 
 def compute_cost(p, y, eps=1.e-9):
+    """
+        Compute cost using Cross Entropy loss function
+        @param: p : np.array of shape (16, batch_size),
+                 column wise probabilities per sample
+        @param: y : one hot encoded np.array of labels
+        @return: loss (float)
+    """
     np.clip(p, eps, 1 - eps)
     loss = (-1.0 * y * np.log(p) - (1.0 - y) * np.log(1 - p))
     return np.squeeze(np.nansum(loss))
@@ -91,11 +118,24 @@ def compute_cost(p, y, eps=1.e-9):
 
 
 def predicted_labels(p):
+    """
+        Converts a columnwise matrix of probabilities into prediction labels
+        @param: p : np.array of shape (16, batch_size), sum(column)=1
+        @return: a list characters, predictions based on max probability per image
+    """
     maxvals = np.argmax(p, axis=0)
     return [label_to_char(maxval) for maxval in maxvals]
 
 
 def percent_good(p, y):
+    """
+        Returns a percentage (range 0 to 100 float) of good predictions
+        @param: p : np.array of shape (16, batch_size), sum(column)=1
+        @param: y : np.array of shape (16, batch_size), one-hot-encoded
+        @return: accuracy : a float between 0 and 100,
+                the percentage of good predictions
+
+    """
     y = predicted_labels(y)
     p = predicted_labels(p)
     missed = 0
