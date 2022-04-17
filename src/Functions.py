@@ -113,6 +113,7 @@ def compute_cost(p, y, eps=1.e-9):
     """
     np.clip(p, eps, 1 - eps)
     loss = (-1.0 * y * np.log(p) - (1.0 - y) * np.log(1 - p))
+    loss /= p.shape[1]
     return np.squeeze(np.nansum(loss))
 
 

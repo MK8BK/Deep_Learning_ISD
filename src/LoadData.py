@@ -47,6 +47,15 @@ def load_pil_image(str_path: str) -> Image:
     im = ImageOps.grayscale(im)
     return im
 
+def flatten_img(nimg):
+    """
+        Returns the flattened representation of an image given as np.array
+        @param: nimg : np.array of shape(rows, columns, 1), the image, px 0-255
+        @return: flattened version: a normalized (0-1) column vector  (h*w, 1)
+    """
+    h, w = nimg.shape[0], nimg.shape[1]
+    return nimg.flatten(order="F").reshape((h*w,1))/255.
+
 
 def load_numpy_image(str_path: str) -> np.array:
     """
@@ -56,8 +65,8 @@ def load_numpy_image(str_path: str) -> np.array:
         @return: im: a normalized np.array of dimensions (h*w,1)
     """
     pil_img = load_pil_image(str_path)
-    h,w = pil_img.size
-    return np.array(pil_img).flatten(order="F").reshape((h*w,1))/255.
+    numpy_image = np.array(pil_img)
+    return flatten_img(numpy_image)
 
 
 def make_input_matrix(samples: list[np.array]) -> np.array:
@@ -156,7 +165,7 @@ def load_training_set(path_str: str, batch_size: int, classes: list[str]=CLASSES
     Y = make_labels_matrix(files, classes)
     return X,Y
 
-def load_prediction_image(path_str):
+def load_prediction_image(path_str: str):
     """
         Loads a single image located at path_str
         @param: path_str: relative path to the image
@@ -168,6 +177,8 @@ def load_prediction_image(path_str):
     x = make_input_matrix([nim])
     #y = make_labels_matrix([path_str])
     return (x, im)#(x, nim, im, y)
+
+
 
 def load_data_set(path_str):
     """

@@ -1,7 +1,6 @@
 from src.Functions import *
 import numpy as np
 
-
 class DenseLinearLayer:
     """
         DenseLinearLayer wrapper class
