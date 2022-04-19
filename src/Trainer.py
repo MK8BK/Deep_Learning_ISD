@@ -46,7 +46,7 @@ def train_on_subset(net, path_str, epochs, batch_size, equilibrium=False,
 				accuracy = percent_good(res, Y)
 				accuracies.append(accuracy)
 				costs.append(cost)
-			print(f"Iteration: {i:{length_of_string}} | Accuracy: {accuracy} %")
+			print(f"Iteration: {i:{length_of_string}} | Accuracy: {accuracy:.2f} %")
 	return accuracies, costs
 
 #def train():
