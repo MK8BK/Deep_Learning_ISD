@@ -23,8 +23,6 @@ dans le data set `EMNIST`.
 
 Implémentation: [Details.ipynb](https://github.com/MK8BK/Deep_Learning_ISD/blob/master/Details.ipynb)
 
-Aspects théoriques: [draft.pynb](https://github.com/MK8BK/Deep_Learning_ISD/blob/master/docs/draft.pdf)
-
 
 ## Démonstration
 [Repositoire GitHub du projet](https://github.com/MK8BK/Deep_Learning_ISD)
